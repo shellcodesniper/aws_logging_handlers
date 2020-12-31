@@ -158,7 +158,7 @@ class S3Stream(BufferedIOBase):
         returns a log file name
         :return: name of the log file in s3
         """
-        filename = os.path.join(self.log_root, "{}_{}").format(self.key, self.start_time))
+        filename = os.path.join(self.log_root, "{}_{}".format(self.key, self.start_time))
         if not self.compress:
             return filename
         return "{}.gz".format(filename)
