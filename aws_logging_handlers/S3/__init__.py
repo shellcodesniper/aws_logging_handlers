@@ -10,6 +10,7 @@ import threading
 import queue
 import gzip
 import codecs
+import os
 
 from logging import StreamHandler
 from io import BufferedIOBase, BytesIO
@@ -67,7 +68,7 @@ class S3Stream(BufferedIOBase):
 
     def __init__(self, bucket: str, key: str, *, chunk_size: int = DEFAULT_CHUNK_SIZE,
                  max_file_log_time: int = DEFAULT_ROTATION_TIME_SECS, max_file_size_bytes: int = MAX_FILE_SIZE_BYTES,
-                 encoder: str = 'utf-8', workers: int = 1, compress: bool = False, encryption_options: dict = None, **boto_session_kwargs):
+                 encoder: str = 'utf-8', workers: int = 1, compress: bool = False, log_root: str = '', encryption_options: dict = None, **boto_session_kwargs):
         """
 
         :param bucket: name of the s3 bucket
@@ -100,6 +101,7 @@ class S3Stream(BufferedIOBase):
         self.max_file_log_time = max_file_log_time
         self.max_file_size_bytes = max_file_size_bytes
         self.current_file_name = "{}_{}".format(key, int(datetime.utcnow().strftime('%s')))
+        self.log_root = log_root
         self.encryption_options = encryption_options if encryption_options else {}
         if compress:
             self.current_file_name = "{}.gz".format(self.current_file_name)
@@ -156,7 +158,7 @@ class S3Stream(BufferedIOBase):
         returns a log file name
         :return: name of the log file in s3
         """
-        filename = "{}_{}".format(self.key, self.start_time)
+        filename = os.path.join(self.log_root, "{}_{}").format(self.key, self.start_time))
         if not self.compress:
             return filename
         return "{}.gz".format(filename)
@@ -293,7 +295,7 @@ class S3Handler(StreamHandler):
     def __init__(self, key: str, bucket: str, *, chunk_size: int = DEFAULT_CHUNK_SIZE,
                  time_rotation: int = DEFAULT_ROTATION_TIME_SECS, max_file_size_bytes: int = MAX_FILE_SIZE_BYTES,
                  encoder: str = 'utf-8',
-                 workers: int = 1, compress: bool = False, **boto_session_kwargs):
+                 workers: int = 1, compress: bool = False, log_root: str = '', **boto_session_kwargs):
         """
 
         :param key: The path of the S3 object
@@ -328,7 +330,7 @@ class S3Handler(StreamHandler):
         self.bucket = bucket
         self.stream = S3Stream(self.bucket, key, chunk_size=chunk_size, max_file_log_time=time_rotation,
                                max_file_size_bytes=max_file_size_bytes, encoder=encoder, workers=workers,
-                               compress=compress, **boto_session_kwargs)
+                               compress=compress, log_root=log_root **boto_session_kwargs)
 
         # Make sure we gracefully clear the buffers and upload the missing parts before exiting
         self._sigterm_handler = signal.signal(signal.SIGTERM, self._teardown)
