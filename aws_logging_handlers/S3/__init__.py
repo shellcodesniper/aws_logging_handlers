@@ -158,7 +158,7 @@ class S3Stream(BufferedIOBase):
     
     @staticmethod
     def datetime_to_str(date):
-      return date.strftime('%y-%m-%d %H:%M:%S')
+      return date.strftime('%Y-%m-%d %H:%M:%S')
     
     @staticmethod
     def datetime_timediff(date1, date2):
