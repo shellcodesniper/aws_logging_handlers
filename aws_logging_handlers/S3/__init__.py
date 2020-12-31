@@ -15,7 +15,7 @@ import os
 from logging import StreamHandler
 from io import BufferedIOBase, BytesIO
 from boto3 import Session
-from datetime
+import datetime
 from aws_logging_handlers.validation import is_non_empty_string, is_positive_int, empty_str_err, bad_integer_err, ValidationRule
 from aws_logging_handlers.tasks import Task, task_worker, STOP_SIGNAL
 
