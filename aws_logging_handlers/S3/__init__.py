@@ -162,9 +162,9 @@ class S3Stream(BufferedIOBase):
     
     @staticmethod
     def datetime_timediff(date1, date2):
-      diff = date1 - date2
-      diff = (-1 * diff) if diff < 0 else diff
-      return diff.total_seconds()
+      diff = (date1 - date2).total_seconds()
+      diff = (-1 * diff) if (diff < 0) else diff
+      return diff
 
 
     def get_filename(self):
