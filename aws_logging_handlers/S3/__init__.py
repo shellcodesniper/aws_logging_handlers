@@ -160,7 +160,7 @@ class S3Stream(BufferedIOBase):
         """
         filename = os.path.join(self.log_root, "{}_{}".format(self.key, self.start_time))
         if not self.compress:
-            return filename
+            return "{}.log".format(filename)
         return "{}.gz".format(filename)
 
     def _add_task(self, task):
@@ -206,6 +206,7 @@ class S3Stream(BufferedIOBase):
         self._add_task(Task(self._close_stream, stream_object=temp_object))
         self.start_time = int(datetime.utcnow().strftime('%s'))
         new_filename = self.get_filename()
+        print ("FILENAME : {}".format(new_filename))
         self._current_object = self._get_stream_object(new_filename)
 
     @staticmethod
