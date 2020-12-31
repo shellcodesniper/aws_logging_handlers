@@ -161,7 +161,7 @@ class S3Stream(BufferedIOBase):
         returns a log file name
         :return: name of the log file in s3
         """
-        filename = os.path.join(self.log_root, "{}_{}".format(self.key, int(datetime.datetime.now(tz=TZ_INFO).strftime('%s'))))
+        filename = os.path.join(self.log_root, "{}_{}".format(self.key, self.start_time))
         if not self.compress:
             return "{}.log".format(filename)
         return "{}.gz".format(filename)
@@ -207,7 +207,7 @@ class S3Stream(BufferedIOBase):
 
         temp_object = self._current_object
         self._add_task(Task(self._close_stream, stream_object=temp_object))
-        self.start_time = int(datetime.utcnow().strftime('%s'))
+        self.start_time = int(datetime.datetime.now(tz=TZ_INFO).strftime('%s'))
         new_filename = self.get_filename()
         print ("FILENAME : {}".format(new_filename))
         self._current_object = self._get_stream_object(new_filename)
@@ -287,7 +287,7 @@ class S3Stream(BufferedIOBase):
 
         if (self.max_file_size_bytes and self._current_object.byte_count > self.max_file_size_bytes) or (
                 self.max_file_log_time and int(
-            datetime.utcnow().strftime('%s')) - self.start_time > self.max_file_log_time):
+            datetime.datetime.now(tz=TZ_INFO).strftime('%s')) - self.start_time > self.max_file_log_time):
             self._rotate_file()
 
 
