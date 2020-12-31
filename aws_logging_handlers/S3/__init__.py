@@ -15,7 +15,7 @@ import os
 from logging import StreamHandler
 from io import BufferedIOBase, BytesIO
 from boto3 import Session
-from datetime import datetime
+from datetime
 from aws_logging_handlers.validation import is_non_empty_string, is_positive_int, empty_str_err, bad_integer_err, ValidationRule
 from aws_logging_handlers.tasks import Task, task_worker, STOP_SIGNAL
 
@@ -96,12 +96,12 @@ class S3Stream(BufferedIOBase):
         self._rotation_queue = queue.Queue()
         self._session = Session()
         self.s3 = self._session.resource('s3', **boto_session_kwargs)
-        self.start_time = int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))
+        self.start_time = int(datetime.datetime.now(tzinfo=TZ_INFO).strftime('%s'))
         self.key = key
         self.chunk_size = chunk_size
         self.max_file_log_time = max_file_log_time
         self.max_file_size_bytes = max_file_size_bytes
-        self.current_file_name = os.path.join(log_root, "{}_{}".format(key, int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
+        self.current_file_name = os.path.join(log_root, "{}_{}".format(key, int(datetime.datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
         self.log_root = log_root
         self.encryption_options = encryption_options if encryption_options else {}
         if compress:
@@ -161,7 +161,7 @@ class S3Stream(BufferedIOBase):
         returns a log file name
         :return: name of the log file in s3
         """
-        filename = os.path.join(self.log_root, "{}_{}".format(self.key, int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
+        filename = os.path.join(self.log_root, "{}_{}".format(self.key, int(datetime.datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
         if not self.compress:
             return "{}.log".format(filename)
         return "{}.gz".format(filename)
