@@ -23,6 +23,7 @@ DEFAULT_CHUNK_SIZE = 5 * 1024 ** 2  # 5 MB
 DEFAULT_ROTATION_TIME_SECS = 12 * 60 * 60  # 12 hours
 MAX_FILE_SIZE_BYTES = 100 * 1024 ** 2  # 100 MB
 MIN_WORKERS_NUM = 1
+TZ_INFO = datetime.timezone(datetime.timedelta(hours=9)) # KOREA SEOUL TIME
 
 
 class StreamObject:
@@ -95,16 +96,18 @@ class S3Stream(BufferedIOBase):
         self._rotation_queue = queue.Queue()
         self._session = Session()
         self.s3 = self._session.resource('s3', **boto_session_kwargs)
-        self.start_time = int(datetime.utcnow().strftime('%s'))
+        self.start_time = int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))
         self.key = key
         self.chunk_size = chunk_size
         self.max_file_log_time = max_file_log_time
         self.max_file_size_bytes = max_file_size_bytes
-        self.current_file_name = "{}_{}".format(key, int(datetime.utcnow().strftime('%s')))
+        self.current_file_name = os.path.join(log_root, "{}_{}".format(key, int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
         self.log_root = log_root
         self.encryption_options = encryption_options if encryption_options else {}
         if compress:
             self.current_file_name = "{}.gz".format(self.current_file_name)
+        else:
+            self.current_file_name = "{}.log".format(self.current_file_name)
         self.encoder = encoder
 
         self.bucket = bucket
@@ -158,7 +161,7 @@ class S3Stream(BufferedIOBase):
         returns a log file name
         :return: name of the log file in s3
         """
-        filename = os.path.join(self.log_root, "{}_{}".format(self.key, self.start_time))
+        filename = os.path.join(self.log_root, "{}_{}".format(self.key, int(datetime.now(tzinfo=TZ_INFO).strftime('%s'))))
         if not self.compress:
             return "{}.log".format(filename)
         return "{}.gz".format(filename)
