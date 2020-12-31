@@ -330,7 +330,7 @@ class S3Handler(StreamHandler):
         self.bucket = bucket
         self.stream = S3Stream(self.bucket, key, chunk_size=chunk_size, max_file_log_time=time_rotation,
                                max_file_size_bytes=max_file_size_bytes, encoder=encoder, workers=workers,
-                               compress=compress, log_root=log_root **boto_session_kwargs)
+                               compress=compress, log_root=log_root, **boto_session_kwargs)
 
         # Make sure we gracefully clear the buffers and upload the missing parts before exiting
         self._sigterm_handler = signal.signal(signal.SIGTERM, self._teardown)
